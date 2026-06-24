@@ -1,22 +1,22 @@
 import React, { useEffect } from 'react'
 import { router } from 'expo-router'
 import { storage } from '../utils/storage'
-
+import { useAuth } from '../features/auth/hooks/useAuth'
 
 const index = () => {
-
+  const { handleGetMe } = useAuth();
 
   useEffect(() => {
-    const checkToken = async () => {
+    const bootstrap = async () => {
       const token = await storage.getToken();
 
       if (token) {
-        router.replace('/(admin)/(tabs)/Dashboard');
+        await handleGetMe(); // success → role-based route, error → login
       } else {
         router.replace('/(auth)/Login');
       }
     };
-    checkToken();
+    bootstrap();
   }, []);
 
   return null;

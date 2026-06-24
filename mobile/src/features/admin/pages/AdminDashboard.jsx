@@ -4,7 +4,8 @@
  * Premium luxury salon management dashboard for Obi Glow.
  * ─────────────────────────────────────────────────────────────────────────────
  */
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from "react";
+import { Ionicons } from "@expo/vector-icons";
 import {
   View,
   Text,
@@ -13,90 +14,150 @@ import {
   Animated,
   StatusBar,
   Dimensions,
-} from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import styles, { COLORS, FONTS } from '../styles/adminDashboard.styles';
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import styles, { COLORS, FONTS } from "../styles/adminDashboard.styles";
 
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get("window");
 
 // ─── Mock Data ────────────────────────────────────────────────────────────────
 const STATS = [
-  { id: 1, icon: '📅', label: "Today's Bookings", value: '12', trend: '↑ 3 from yesterday', variant: 'gold', badge: 'Live' },
-  { id: 2, icon: '⏳', label: 'Pending Bookings', value: '5',  trend: 'Needs attention', variant: 'blush', badge: null },
-  { id: 3, icon: '👥', label: 'Total Customers', value: '248', trend: '↑ 18 this month', variant: 'default', badge: null },
-  { id: 4, icon: '✨', label: 'Total Services', value: '32',  trend: 'Across 6 categories', variant: 'dark', badge: null },
+  {
+    id: 1,
+    icon: "calendar",
+    iconLib: "Ionicons",
+    label: "Today's Bookings",
+    value: "12",
+    trend: "↑ 3 from yesterday",
+    variant: "gold",
+    badge: "Live",
+  },
+  {
+    id: 2,
+    icon: "time-outline",
+    iconLib: "Ionicons",
+    label: "Pending Bookings",
+    value: "5",
+    trend: "Needs attention",
+    variant: "blush",
+    badge: null,
+  },
+  {
+    id: 3,
+    icon: "people",
+    iconLib: "Ionicons",
+    label: "Total Customers",
+    value: "248",
+    trend: "↑ 18 this month",
+    variant: "default",
+    badge: null,
+  },
+  {
+    id: 4,
+    icon: "sparkles",
+    iconLib: "Ionicons",
+    label: "Total Services",
+    value: "32",
+    trend: "Across 6 categories",
+    variant: "dark",
+    badge: null,
+  },
 ];
 
 const QUICK_ACTIONS = [
-  { id: 1, icon: '＋', label: 'Add Service',   primary: true  },
-  { id: 2, icon: '📋', label: 'Bookings',       primary: false },
-  { id: 3, icon: '🖼️', label: 'Upload Work',    primary: false },
-  { id: 4, icon: '👤', label: 'Customers',      primary: false },
+  { id: 1, icon: "add-circle", label: "Add Service", primary: true },
+  { id: 2, icon: "calendar-outline", label: "Bookings", primary: false },
+  { id: 3, icon: "cloud-upload-outline", label: "Upload Work", primary: false },
+  { id: 4, icon: "people-outline", label: "Customers", primary: false },
 ];
 
 const APPOINTMENTS = [
   {
     id: 1,
-    name: 'Priya Sharma',
-    initials: 'PS',
-    service: 'Bridal Makeup Package',
-    time: '10:00 AM',
-    duration: '3 hrs',
-    price: '₹4,500',
-    status: 'confirmed',
+    name: "Priya Sharma",
+    initials: "PS",
+    service: "Bridal Makeup Package",
+    time: "10:00 AM",
+    duration: "3 hrs",
+    price: "₹4,500",
+    status: "confirmed",
   },
   {
     id: 2,
-    name: 'Ananya Gupta',
-    initials: 'AG',
-    service: 'Hair Colour & Highlights',
-    time: '12:30 PM',
-    duration: '2 hrs',
-    price: '₹3,200',
-    status: 'confirmed',
+    name: "Ananya Gupta",
+    initials: "AG",
+    service: "Hair Colour & Highlights",
+    time: "12:30 PM",
+    duration: "2 hrs",
+    price: "₹3,200",
+    status: "confirmed",
   },
   {
     id: 3,
-    name: 'Neha Verma',
-    initials: 'NV',
-    service: 'Facial & Glow Treatment',
-    time: '3:00 PM',
-    duration: '1.5 hrs',
-    price: '₹1,800',
-    status: 'pending',
+    name: "Neha Verma",
+    initials: "NV",
+    service: "Facial & Glow Treatment",
+    time: "3:00 PM",
+    duration: "1.5 hrs",
+    price: "₹1,800",
+    status: "pending",
   },
 ];
 
 const RECENT_BOOKINGS = [
   {
     id: 1,
-    name: 'Ritika Malhotra',
-    initials: 'RM',
-    service: 'Nail Art & Manicure',
-    date: 'Tomorrow, 11:00 AM',
+    name: "Ritika Malhotra",
+    initials: "RM",
+    service: "Nail Art & Manicure",
+    date: "Tomorrow, 11:00 AM",
   },
   {
     id: 2,
-    name: 'Simran Kaur',
-    initials: 'SK',
-    service: 'Party Makeup & Hair',
-    date: 'Jun 25, 2:00 PM',
+    name: "Simran Kaur",
+    initials: "SK",
+    service: "Party Makeup & Hair",
+    date: "Jun 25, 2:00 PM",
   },
 ];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 const getStatusColors = (status) => {
   switch (status) {
-    case 'confirmed': return { bg: COLORS.statusConfirmedBg, text: COLORS.statusConfirmed, label: 'Confirmed' };
-    case 'pending':   return { bg: COLORS.statusPendingBg,   text: COLORS.statusPending,   label: 'Pending'   };
-    case 'cancelled': return { bg: COLORS.statusCancelledBg, text: COLORS.statusCancelled, label: 'Cancelled' };
-    default:          return { bg: COLORS.statusPendingBg,   text: COLORS.statusPending,   label: 'Pending'   };
+    case "confirmed":
+      return {
+        bg: COLORS.statusConfirmedBg,
+        text: COLORS.statusConfirmed,
+        label: "Confirmed",
+      };
+    case "pending":
+      return {
+        bg: COLORS.statusPendingBg,
+        text: COLORS.statusPending,
+        label: "Pending",
+      };
+    case "cancelled":
+      return {
+        bg: COLORS.statusCancelledBg,
+        text: COLORS.statusCancelled,
+        label: "Cancelled",
+      };
+    default:
+      return {
+        bg: COLORS.statusPendingBg,
+        text: COLORS.statusPending,
+        label: "Pending",
+      };
   }
 };
 
 const getDateString = () => {
   const d = new Date();
-  return d.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' });
+  return d.toLocaleDateString("en-IN", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  });
 };
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
@@ -107,25 +168,54 @@ const StatCard = ({ stat, index }) => {
 
   useEffect(() => {
     Animated.parallel([
-      Animated.timing(fadeAnim, { toValue: 1, duration: 400, delay: index * 100, useNativeDriver: true }),
-      Animated.spring(slideAnim, { toValue: 0, delay: index * 100, useNativeDriver: true, bounciness: 5 }),
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 400,
+        delay: index * 100,
+        useNativeDriver: true,
+      }),
+      Animated.spring(slideAnim, {
+        toValue: 0,
+        delay: index * 100,
+        useNativeDriver: true,
+        bounciness: 5,
+      }),
     ]).start();
   }, []);
 
   const cardStyle = [
     styles.statCard,
-    stat.variant === 'gold'  && styles.statCardGold,
-    stat.variant === 'blush' && styles.statCardBlush,
-    stat.variant === 'dark'  && styles.statCardDark,
+    stat.variant === "gold" && styles.statCardGold,
+    stat.variant === "blush" && styles.statCardBlush,
+    stat.variant === "dark" && styles.statCardDark,
   ];
 
-  const isDark = stat.variant === 'dark';
+  const isDark = stat.variant === "dark";
 
   return (
-    <Animated.View style={[cardStyle, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
+    <Animated.View
+      style={[
+        cardStyle,
+        { opacity: fadeAnim, transform: [{ translateY: slideAnim }] },
+      ]}
+    >
       <View style={styles.statIconRow}>
-        <View style={[styles.statIconBubble, isDark && styles.statIconBubbleDark]}>
-          <Text style={styles.statIcon}>{stat.icon}</Text>
+        <View
+          style={[styles.statIconBubble, isDark && styles.statIconBubbleDark]}
+        >
+          <Ionicons
+            name={stat.icon}
+            size={22}
+            color={
+              isDark
+                ? "#C9A96E"
+                : stat.variant === "gold"
+                  ? "#8B6914"
+                  : stat.variant === "blush"
+                    ? "#9E4E6A"
+                    : "#7C6A8D"
+            }
+          />
         </View>
         {stat.badge && (
           <View style={styles.statBadge}>
@@ -133,9 +223,17 @@ const StatCard = ({ stat, index }) => {
           </View>
         )}
       </View>
-      <Text style={[styles.statValue, isDark && styles.statValueLight]}>{stat.value}</Text>
-      <Text style={[styles.statLabel, isDark && styles.statLabelLight]}>{stat.label}</Text>
-      <Text style={[styles.statTrend, isDark && { color: 'rgba(201,169,110,0.8)' }]}>{stat.trend}</Text>
+      <Text style={[styles.statValue, isDark && styles.statValueLight]}>
+        {stat.value}
+      </Text>
+      <Text style={[styles.statLabel, isDark && styles.statLabelLight]}>
+        {stat.label}
+      </Text>
+      <Text
+        style={[styles.statTrend, isDark && { color: "rgba(201,169,110,0.8)" }]}
+      >
+        {stat.trend}
+      </Text>
     </Animated.View>
   );
 };
@@ -154,19 +252,36 @@ const AppointmentCard = ({ appt }) => {
         </View>
         <View>
           <Text style={styles.appointmentTime}>{appt.time}</Text>
-          <View style={[styles.statusBadge, { backgroundColor: status.bg, marginTop: 4 }]}>
-            <Text style={[styles.statusText, { color: status.text }]}>{status.label}</Text>
+          <View
+            style={[
+              styles.statusBadge,
+              { backgroundColor: status.bg, marginTop: 4 },
+            ]}
+          >
+            <Text style={[styles.statusText, { color: status.text }]}>
+              {status.label}
+            </Text>
           </View>
         </View>
       </View>
       <View style={styles.appointmentDivider} />
       <View style={styles.appointmentMeta}>
         <View style={styles.appointmentMetaItem}>
-          <Text style={styles.appointmentMetaIcon}>⏱</Text>
+          <Ionicons
+            name="timer-outline"
+            size={14}
+            color="#9E8FB0"
+            style={{ marginRight: 4 }}
+          />
           <Text style={styles.appointmentMetaText}>{appt.duration}</Text>
         </View>
         <View style={styles.appointmentMetaItem}>
-          <Text style={styles.appointmentMetaIcon}>💰</Text>
+          <Ionicons
+            name="cash-outline"
+            size={14}
+            color="#9E8FB0"
+            style={{ marginRight: 4 }}
+          />
           <Text style={styles.appointmentMetaText}>{appt.price}</Text>
         </View>
       </View>
@@ -179,10 +294,10 @@ const BookingCard = ({ booking }) => {
   const [rejected, setRejected] = useState(false);
 
   if (accepted || rejected) {
-    const status = getStatusColors(accepted ? 'confirmed' : 'cancelled');
+    const status = getStatusColors(accepted ? "confirmed" : "cancelled");
     return (
       <View style={[styles.bookingCard, { borderColor: status.bg }]}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
           <View style={[styles.bookingAvatar, { backgroundColor: status.bg }]}>
             <Text style={styles.bookingAvatarText}>{booking.initials}</Text>
           </View>
@@ -192,7 +307,7 @@ const BookingCard = ({ booking }) => {
           </View>
           <View style={[styles.statusBadge, { backgroundColor: status.bg }]}>
             <Text style={[styles.statusText, { color: status.text }]}>
-              {accepted ? 'Accepted ✓' : 'Declined ✕'}
+              {accepted ? "Accepted ✓" : "Declined ✕"}
             </Text>
           </View>
         </View>
@@ -213,10 +328,18 @@ const BookingCard = ({ booking }) => {
         </View>
       </View>
       <View style={styles.bookingActions}>
-        <TouchableOpacity style={styles.acceptBtn} onPress={() => setAccepted(true)} activeOpacity={0.8}>
+        <TouchableOpacity
+          style={styles.acceptBtn}
+          onPress={() => setAccepted(true)}
+          activeOpacity={0.8}
+        >
           <Text style={styles.acceptBtnText}>Accept</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.rejectBtn} onPress={() => setRejected(true)} activeOpacity={0.8}>
+        <TouchableOpacity
+          style={styles.rejectBtn}
+          onPress={() => setRejected(true)}
+          activeOpacity={0.8}
+        >
           <Text style={styles.rejectBtnText}>Decline</Text>
         </TouchableOpacity>
       </View>
@@ -229,7 +352,11 @@ const AdminDashboard = () => {
   const headerAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    Animated.timing(headerAnim, { toValue: 1, duration: 600, useNativeDriver: true }).start();
+    Animated.timing(headerAnim, {
+      toValue: 1,
+      duration: 600,
+      useNativeDriver: true,
+    }).start();
   }, []);
 
   return (
@@ -241,13 +368,12 @@ const AdminDashboard = () => {
         <View style={styles.headerLeft}>
           <Text style={styles.greetingLabel}>Good Morning</Text>
           <Text style={styles.greetingName}>
-            Obi{' '}
-            <Text style={styles.greetingNameAccent}>Studio ✦</Text>
+            Obi <Text style={styles.greetingNameAccent}>Studio ✦</Text>
           </Text>
         </View>
         <View style={styles.headerRight}>
           <TouchableOpacity style={styles.notificationBtn} activeOpacity={0.8}>
-            <Text style={{ fontSize: 18 }}>🔔</Text>
+            <Ionicons name="notifications-outline" size={22} color="#4A3F6B" />
             <View style={styles.notificationDot} />
           </TouchableOpacity>
           <TouchableOpacity style={styles.avatarWrapper} activeOpacity={0.8}>
@@ -291,11 +417,24 @@ const AdminDashboard = () => {
             {QUICK_ACTIONS.map((action) => (
               <TouchableOpacity
                 key={action.id}
-                style={[styles.quickActionBtn, action.primary && styles.quickActionBtnPrimary]}
+                style={[
+                  styles.quickActionBtn,
+                  action.primary && styles.quickActionBtnPrimary,
+                ]}
                 activeOpacity={0.8}
               >
-                <Text style={styles.quickActionIcon}>{action.icon}</Text>
-                <Text style={[styles.quickActionLabel, action.primary && styles.quickActionLabelPrimary]}>
+                <Ionicons
+                  name={action.icon}
+                  size={24}
+                  color={action.primary ? "#FFFFFF" : "#5C4F8A"}
+                  style={{ marginBottom: 6 }}
+                />
+                <Text
+                  style={[
+                    styles.quickActionLabel,
+                    action.primary && styles.quickActionLabelPrimary,
+                  ]}
+                >
                   {action.label}
                 </Text>
               </TouchableOpacity>
@@ -307,7 +446,8 @@ const AdminDashboard = () => {
         <View style={styles.appointmentSection}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>
-              Upcoming <Text style={styles.sectionTitleAccent}>Appointments</Text>
+              Upcoming{" "}
+              <Text style={styles.sectionTitleAccent}>Appointments</Text>
             </Text>
             <TouchableOpacity>
               <Text style={styles.seeAllBtn}>See All</Text>

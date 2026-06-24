@@ -1,6 +1,7 @@
 import userModel from "../models/User.model.js";
 import jwt from "jsonwebtoken";
 import { config } from "../config/config.js";
+import BlacklistedToken from "../models/BlacklistedToken.model.js";
 
 export const authMiddleware = async (req, res, next) => {
   try {
@@ -9,6 +10,13 @@ export const authMiddleware = async (req, res, next) => {
       return res.status(401).json({ message: "Unauthorized" });
     }
     const token = authHeader.split(" ")[1];
+
+    // ── Blacklist check ──────────────────────────────────────────────────────
+    const isBlacklisted = await BlacklistedToken.exists({ token });
+    if (isBlacklisted) {
+      return res.status(401).json({ message: "Token has been revoked. Please login again." });
+    }
+
     const decodedToken = jwt.verify(token, config.jwtSecret);
     const user = await userModel.findById(decodedToken.id);
     if (!user) {
@@ -29,6 +37,13 @@ export const adminAuthMiddleware = async (req, res, next) => {
       return res.status(401).json({ message: "Unauthorized" });
     }
     const token = authHeader.split(" ")[1];
+
+    // ── Blacklist check ──────────────────────────────────────────────────────
+    const isBlacklisted = await BlacklistedToken.exists({ token });
+    if (isBlacklisted) {
+      return res.status(401).json({ message: "Token has been revoked. Please login again." });
+    }
+
     const decodedToken = jwt.verify(token, config.jwtSecret);
     const user = await userModel.findById(decodedToken.id);
     if (!user) {

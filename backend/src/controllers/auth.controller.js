@@ -3,6 +3,8 @@ import { OAuth2Client } from "google-auth-library";
 import { config } from "../config/config.js";
 import userModel from "../models/User.model.js";
 import generateToken from "../utils/generateToken.js";
+import BlacklistedToken from "../models/BlacklistedToken.model.js";
+
 
 const client = new OAuth2Client(config.googleClientId);
 
@@ -60,6 +62,55 @@ export const googleLogin = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
+  }
+};
+
+export const getMe = async (req, res) => {
+  try {
+    const user = req.user;
+
+    
+
+    res.status(200).json({
+      success: true,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        profilePicture: user.profilePicture,
+        role: user.role,
+      },
+    });
+  } catch (error) {
+    console.log("getMe error:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+
+export const logout = async (req, res) => {
+  try {
+    // Authorization header se raw token nikalo
+    const token = req.headers.authorization?.split(" ")[1];
+
+    if (token) {
+      // JWT decode karo (verify nahi — sirf exp claim chahiye)
+      const decoded = jwt.decode(token);
+      const expiresAt = decoded?.exp
+        ? new Date(decoded.exp * 1000)   // Unix timestamp → Date
+        : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // fallback: 30d
+
+      // Blacklist mein save karo — MongoDB TTL auto-delete karega
+      await BlacklistedToken.create({ token, expiresAt });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Logout successful",
+    });
+  } catch (error) {
+    console.log("logout error:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
 

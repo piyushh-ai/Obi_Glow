@@ -8,3 +8,23 @@ export const login = async (token) => {
     console.log("Error in login api", error);
   }
 };
+
+export const getMe = async () => {
+  try {
+    const response = await api.get("/auth/get-me");
+    return response.data;
+  } catch (error) {
+    console.log("Error in getMe api", error);
+    throw error; // caller ke catch block tak pahunchao
+  }
+};
+
+export const logout = async () => {
+  try {
+    const response = await api.post("/auth/logout");
+    return response.data;
+  } catch (error) {
+    console.log("Error in logout api", error);
+    throw error;
+  }
+};

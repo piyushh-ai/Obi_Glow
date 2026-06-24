@@ -1,12 +1,7 @@
-import { View, Text } from 'react-native'
-import React from 'react'
+import AdminProfile from "../../../features/admin/pages/AdminProfile";
 
 const Profile = () => {
-  return (
-    <View>
-      <Text>Profile</Text>
-    </View>
-  )
-}
+  return <AdminProfile />;
+};
 
-export default Profile
+export default Profile;

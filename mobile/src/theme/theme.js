@@ -29,8 +29,8 @@ export const COLORS = {
   blushDark: '#e8b4aa',
   /** Pure black — primary text, buttons */
   black: '#000000',
-  /** Rich charcoal — secondary text */
-  charcoal: '#2d2d2d',
+  /** Deep espresso — warm rich dark for headers, buttons, dark cards */
+  charcoal: '#272727',
   /** Muted text */
   textMuted: 'rgba(0,0,0,0.42)',
   /** Pure white — borders, button text */
