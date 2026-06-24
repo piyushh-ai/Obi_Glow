@@ -19,6 +19,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../auth/hooks/useAuth';
 import styles from '../styles/AdminProfile.styles';
 import { COLORS } from '../../../theme/theme';
+import { router } from 'expo-router';
 
 // ─── Menu Items ───────────────────────────────────────────────────────────────
 const MENU_ITEMS = [
@@ -107,8 +108,7 @@ const AdminProfile = () => {
   };
 
   const handleCreateService = () => {
-    console.log('Create service pressed');
-    // router.push('/(admin)/CreateService');
+    router.push('/(admin)/services/CreateService');
   };
 
   return (

@@ -25,7 +25,6 @@ const serviceSchema = new mongoose.Schema(
     category: {
       type: String,
       required: true,
-      enum: ["Hair", "Skin", "Nails", "Makeup", "Spa", "Other"],
     },
     subCategory: {
       type: String,
@@ -57,9 +56,8 @@ const serviceSchema = new mongoose.Schema(
       default: 0,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const serviceModel = mongoose.model("Service", serviceSchema);
 export default serviceModel;
-

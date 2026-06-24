@@ -5,6 +5,7 @@
  * ─────────────────────────────────────────────────────────────────────────────
  */
 import React, { useState, useRef, useEffect } from "react";
+import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import {
   View,
@@ -15,7 +16,6 @@ import {
   StatusBar,
   Dimensions,
 } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import styles, { COLORS, FONTS } from "../styles/adminDashboard.styles";
 
 const { width } = Dimensions.get("window");
@@ -65,7 +65,7 @@ const STATS = [
 ];
 
 const QUICK_ACTIONS = [
-  { id: 1, icon: "add-circle", label: "Add Service", primary: true },
+  { id: 1, icon: "add-circle", label: "Add Service", primary: true, onPress: () => router.push("/(admin)/services/CreateService") },
   { id: 2, icon: "calendar-outline", label: "Bookings", primary: false },
   { id: 3, icon: "cloud-upload-outline", label: "Upload Work", primary: false },
   { id: 4, icon: "people-outline", label: "Customers", primary: false },
@@ -422,6 +422,11 @@ const AdminDashboard = () => {
                   action.primary && styles.quickActionBtnPrimary,
                 ]}
                 activeOpacity={0.8}
+                onPress={() => {
+                  if (action.onPress) {
+                    action.onPress();
+                  }
+                }}
               >
                 <Ionicons
                   name={action.icon}
