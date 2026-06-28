@@ -13,6 +13,7 @@ import React, {
   useCallback,
   useMemo,
 } from "react";
+import usePageRefresh from "../../../hooks/usePageRefresh";
 import {
   View,
   Text,
@@ -25,13 +26,13 @@ import {
   ScrollView,
   Modal,
   Alert,
+  RefreshControl,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { useDispatch } from "react-redux";
 import { useAdmin } from "../hooks/useAdmin";
-import { toggleServiceAvailability } from "../state/adminSlice";
 import styles, { COLORS, FONTS } from "../styles/AdminServices.styles";
+
 
 const { width } = Dimensions.get("window");
 
@@ -326,7 +327,6 @@ const CategoryPill = ({ cat, isActive, count, onPress }) => {
 
 // ─── Main Component ─────────────────────────────────────────────────────────
 const AdminServices = () => {
-  const dispatch = useDispatch();
   const {
     services,
     isLoading,
@@ -335,10 +335,14 @@ const AdminServices = () => {
     handleDeleteService,
   } = useAdmin();
 
+
   const [activeCategory, setActiveCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedService, setSelectedService] = useState(null);
   const [menuVisible, setMenuVisible] = useState(false);
+
+  // ── Global pull-to-refresh (reusable across pages) ──────────────────────
+  const { refreshing, onRefresh } = usePageRefresh(handleGetAllServices);
 
   const headerAnim = useRef(new Animated.Value(0)).current;
   const listKey = useRef(0);
@@ -592,6 +596,15 @@ const AdminServices = () => {
               All Services · {filteredServices.length}
             </Text>
           ) : null
+        }
+        refreshControl={
+          // refreshing & onRefresh come from global usePageRefresh hook
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={[COLORS.gold]}
+            tintColor={COLORS.gold}
+          />
         }
       />
 

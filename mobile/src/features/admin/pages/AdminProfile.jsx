@@ -5,6 +5,8 @@
  * ─────────────────────────────────────────────────────────────────────────────
  */
 import React from 'react';
+import usePageRefresh from '../../../hooks/usePageRefresh';
+
 import {
   View,
   Text,
@@ -13,6 +15,7 @@ import {
   Image,
   StatusBar,
   Alert,
+  RefreshControl,
 } from 'react-native';
 import { useSelector } from 'react-redux';
 import { Ionicons } from '@expo/vector-icons';
@@ -86,6 +89,9 @@ const Avatar = ({ user }) => {
 const AdminProfile = () => {
   const { user } = useSelector((state) => state.auth);
   const { handleLogout } = useAuth();
+  // ── Global pull-to-refresh (reusable across pages) ──────────────────────
+  // TODO: replace the no-op with a real profile/data fetch when API is ready
+  const { refreshing, onRefresh } = usePageRefresh(async () => {});
 
   const handleLogoutPress = () => {
     Alert.alert(
@@ -115,7 +121,17 @@ const AdminProfile = () => {
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor={COLORS.charcoal} />
 
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={[COLORS.gold]}
+            tintColor={COLORS.gold}
+          />
+        }
+      >
 
         {/* ── Hero Header ────────────────────────────────────────────────── */}
         <View style={styles.heroContainer}>

@@ -5,6 +5,7 @@
  * ─────────────────────────────────────────────────────────────────────────────
  */
 import React, { useState, useRef, useEffect } from "react";
+import usePageRefresh from "../../../hooks/usePageRefresh";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import {
@@ -15,6 +16,7 @@ import {
   Animated,
   StatusBar,
   Dimensions,
+  RefreshControl,
 } from "react-native";
 import styles, { COLORS, FONTS } from "../styles/adminDashboard.styles";
 
@@ -65,7 +67,13 @@ const STATS = [
 ];
 
 const QUICK_ACTIONS = [
-  { id: 1, icon: "add-circle", label: "Add Service", primary: true, onPress: () => router.push("/(admin)/services/CreateService") },
+  {
+    id: 1,
+    icon: "add-circle",
+    label: "Add Service",
+    primary: true,
+    onPress: () => router.push("/(admin)/services/CreateService"),
+  },
   { id: 2, icon: "calendar-outline", label: "Bookings", primary: false },
   { id: 3, icon: "cloud-upload-outline", label: "Upload Work", primary: false },
   { id: 4, icon: "people-outline", label: "Customers", primary: false },
@@ -350,6 +358,9 @@ const BookingCard = ({ booking }) => {
 // ─── Main Component ───────────────────────────────────────────────────────────
 const AdminDashboard = () => {
   const headerAnim = useRef(new Animated.Value(0)).current;
+  // ── Global pull-to-refresh (reusable across pages) ──────────────────────
+  // TODO: replace the no-op with a real dashboard fetch when API is ready
+  const { refreshing, onRefresh } = usePageRefresh(async () => {});
 
   useEffect(() => {
     Animated.timing(headerAnim, {
@@ -386,6 +397,14 @@ const AdminDashboard = () => {
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={[COLORS.gold]}
+            tintColor={COLORS.gold}
+          />
+        }
       >
         {/* ── Date Banner ──────────────────────────────────────────────────── */}
         <View style={styles.dateBanner}>
